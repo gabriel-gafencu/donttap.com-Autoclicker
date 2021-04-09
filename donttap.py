@@ -19,19 +19,20 @@ while True:
 
     kernel = np.ones((5, 5), np.uint8)
     image = cv2.dilate(image, kernel)
+    image = cv2.erode(image, kernel)
 
     ret, image = cv2.threshold(image, 1, 255, cv2.THRESH_BINARY_INV)
 
     cnts = cv2.findContours(image.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     cnts = imutils.grab_contours(cnts)
 
-    if len(cnts) > 0:
-        c = cnts[0]
+    for c in cnts:
         M = cv2.moments(c)
         cX = int(M["m10"] / M["m00"])
         cY = int(M["m01"] / M["m00"])
 
-        pyautogui.click(x=left_x + cX, y=left_y + cY)
+        if cv2.contourArea(c) >= 10000:
+            pyautogui.click(x=left_x + cX, y=left_y + cY)
 
     cv2.imshow("Screenshot", image)
-    cv2.waitKey(1)
+    key = cv2.waitKey(1)
